@@ -38,11 +38,7 @@ class AddActivityActivity : AppCompatActivity() {
 
         itemViewModel.allItems(1).observe(this@AddActivityActivity) { item ->
             item?.let {
-                if (it.isEmpty()) {
-                    Toast.makeText(this@AddActivityActivity, "add Items", Toast.LENGTH_SHORT).show()
-                } else {
                     binding.recyclerview.adapter = ItemViewAdapter(this@AddActivityActivity, it)
-                }
             }
         }
 

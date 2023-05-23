@@ -67,9 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //loadInterstitialAd
         AppManage.getInstance(this).loadInterstitialAd(
-            this,
-            AppManage.ADMOB_I[0],
-            AppManage.FACEBOOK_I[0]
+            this, AppManage.ADMOB_I[0], AppManage.FACEBOOK_I[0]
         )
 
         //banner ads
@@ -127,12 +125,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .replace(R.id.fragment_container, InvoiceFragment()).commit()
         binding.appbar.bottomNavView.setOnItemSelectedListener { item ->
             lateinit var fragment: Fragment
+            val user = getSharedPreferences("userinfo", MODE_PRIVATE)
+            val id = user.getInt("userId", 0)
             when (item.itemId) {
 
                 R.id.nav_estimate -> {
                     fragment = EstimateFragment()
                     binding.appbar.floatingButton.setOnClickListener {
-                        startActivity(Intent(this@MainActivity, EstimateAddActivity::class.java))
+                        if (id != 0) {
+                            startActivity(
+                                Intent(
+                                    this@MainActivity, EstimateAddActivity::class.java
+                                )
+                            )
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity, "please create user !!", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                     }
                     binding.appbar.appbarTitle.text = "Estimate"
                 }
@@ -140,9 +151,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.nav_client -> {
                     fragment = ClientFragment()
                     binding.appbar.floatingButton.setOnClickListener {
-                        val intent = Intent(this@MainActivity, ClientAddActivity::class.java)
-                        intent.putExtra("edit", false)
-                        startActivity(intent)
+                        if (id != 0) {
+                            val intent = Intent(this@MainActivity, ClientAddActivity::class.java)
+                            intent.putExtra("edit", false)
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity, "please create user !!", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                     }
                     binding.appbar.appbarTitle.text = "Client"
                 }
@@ -150,9 +168,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.nav_items -> {
                     fragment = ItemFragment()
                     binding.appbar.floatingButton.setOnClickListener {
-                        val intent = Intent(this@MainActivity, ItemsAddActivity::class.java)
-                        intent.putExtra("edit", false)
-                        startActivity(intent)
+                        if (id != 0) {
+                            val intent = Intent(this@MainActivity, ItemsAddActivity::class.java)
+                            intent.putExtra("edit", false)
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity, "please create user !!", Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                     binding.appbar.appbarTitle.text = "Item"
                 }

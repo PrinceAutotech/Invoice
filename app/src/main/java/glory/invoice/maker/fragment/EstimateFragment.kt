@@ -6,13 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import glory.invoice.maker.adapter.ClientAdapter
 import glory.invoice.maker.adapter.DownloadAdapter
 import glory.invoice.maker.adapter.InvoiceAdapter
-import glory.invoice.maker.adapter.ItemAdapter
 import glory.invoice.maker.databinding.FragmentEstimateBinding
 import glory.invoice.maker.viewmodel.InvoiceViewModel
 import glory.invoice.maker.viewmodel.UserViewModel
@@ -29,6 +26,7 @@ class EstimateFragment : Fragment() {
     private val userViewModel: UserViewModel by lazy {
         ViewModelProvider(this)[UserViewModel::class.java]
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -36,9 +34,14 @@ class EstimateFragment : Fragment() {
         activityContext = requireActivity()
 
         userViewModel.getUserWithInvoice().observe(activityContext as FragmentActivity) { client ->
-            for (i in client) {
-                binding.recyclerview.adapter = InvoiceAdapter(activityContext, i.invoice){
-
+            if (client.isEmpty()) {
+                binding.noData.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
+            } else {
+                for (i in client) {
+                    binding.noData.visibility = View.GONE
+                    binding.recyclerview.visibility = View.VISIBLE
+                    binding.recyclerview.adapter = InvoiceAdapter(activityContext, i.invoice)
                 }
             }
         }
@@ -64,7 +67,5 @@ class EstimateFragment : Fragment() {
 
         return binding.root
     }
-
-
 
 }

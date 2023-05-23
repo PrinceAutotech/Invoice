@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
@@ -43,10 +44,16 @@ class ItemFragment : Fragment() {
         activityContext = requireContext()
 
         userViewModel.getUserWithItems().observe(activityContext as FragmentActivity) { client ->
-            for (i in client) {
-                binding.noData.visibility = View.GONE
-                binding.recyclerview.adapter =
-                    ItemAdapter(activityContext, i.items, ::performOptionsMenuClick)
+            if (client.isEmpty()) {
+                binding.noData.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
+            } else {
+                for (i in client) {
+                    binding.noData.visibility = View.GONE
+                    binding.recyclerview.visibility = View.VISIBLE
+                    binding.recyclerview.adapter =
+                        ItemAdapter(activityContext, i.items, ::performOptionsMenuClick)
+                }
             }
         }
 
@@ -62,7 +69,7 @@ class ItemFragment : Fragment() {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 when (item?.itemId) {
                     R.id.delete -> {
-                        itemViewModel.deleteItem(id)
+                        itemViewModel.deleteItem(itemData.id!!)
                         Toast.makeText(activityContext, "delete", Toast.LENGTH_SHORT).show()
                         return true
                     }

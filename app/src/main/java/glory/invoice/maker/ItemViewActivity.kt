@@ -26,9 +26,9 @@ class ItemViewActivity : AppCompatActivity() {
         }
 
         val item = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("item", Items::class.java)
-        } else {
             intent.getParcelableExtra("item")
+        } else {
+            intent.getParcelableExtra<Items>("item")
         }
 
         //banner ads
@@ -36,7 +36,7 @@ class ItemViewActivity : AppCompatActivity() {
             binding.linearLayout, AppManage.ADMOB_I[0], AppManage.FACEBOOK_I[0]
         )
 
-        binding.item.setText(item.item)
+        binding.item.setText(item!!.item)
         binding.price.setText(item.rate.toString())
         binding.qty.setText(item.qty.toString())
 

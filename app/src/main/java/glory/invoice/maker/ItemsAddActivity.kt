@@ -40,9 +40,9 @@ class ItemsAddActivity : AppCompatActivity() {
         )
 
         val item = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("item", Items::class.java)
-        } else {
             intent.getParcelableExtra("item")
+        } else {
+            intent.getParcelableExtra<Items>("item")
         }
 
         val edit = intent.getBooleanExtra("edit", true)
@@ -53,22 +53,24 @@ class ItemsAddActivity : AppCompatActivity() {
             binding.delete.visibility = View.VISIBLE
             binding.delete.setOnClickListener {
                 val builder = AlertDialog.Builder(this)
-                builder.setCancelable(false).setPositiveButton("Yes") { dialog, id ->
+                builder.setCancelable(false).setPositiveButton("Yes") { _, _ ->
                     val name = binding.item.text.toString()
                     val rate1 = binding.price.text.toString().toInt()
                     val qty1 = binding.qty.text.toString().toInt()
                     val desc = binding.desc.text.toString()
                     val total = rate1 * qty1
-                    itemViewModel.delete(
-                        Items(
-                            item.id,
-                            item = name,
-                            rate = rate1,
-                            qty = qty1,
-                            price = total,
-                            userId = item.userId
+                    if (item != null) {
+                        itemViewModel.delete(
+                            Items(
+                                item.id,
+                                item = name,
+                                rate = rate1,
+                                qty = qty1,
+                                price = total,
+                                userId = item.userId
+                            )
                         )
-                    )
+                    }
                     Toast.makeText(this@ItemsAddActivity, "deleted !!", Toast.LENGTH_SHORT).show()
                     finish()
                 }.setNegativeButton(
@@ -83,8 +85,10 @@ class ItemsAddActivity : AppCompatActivity() {
 
             }
 
-            binding.item.setText(item.item)
-            binding.price.setText(item.rate.toString())
+            if (item != null) {
+                binding.item.setText(item.item)
+            }
+            binding.price.setText(item!!.rate.toString())
             binding.qty.setText(item.qty.toString())
 
 

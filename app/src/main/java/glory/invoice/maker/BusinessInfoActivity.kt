@@ -80,7 +80,7 @@ class BusinessInfoActivity : AppCompatActivity() {
                         )
                         userViewModel.update(user)
                         onBackPressed()
-                        Toast.makeText(this@BusinessInfoActivity, "Done !!", Toast.LENGTH_SHORT)
+                        Toast.makeText(this@BusinessInfoActivity, "updated !!", Toast.LENGTH_SHORT)
                             .show()
                     }
                     Toast.makeText(this@BusinessInfoActivity, "Select image !!", Toast.LENGTH_SHORT)
@@ -100,8 +100,12 @@ class BusinessInfoActivity : AppCompatActivity() {
                     )
 
                     userViewModel.insert(user)
+                    val sharedPreferences = getSharedPreferences("userinfo", MODE_PRIVATE)
+                    val myEdit = sharedPreferences.edit()
+                    myEdit.putInt("userId", 1)
+                    myEdit.apply()
                     onBackPressed()
-                    Toast.makeText(this@BusinessInfoActivity, "Done !!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@BusinessInfoActivity, "inserted !!", Toast.LENGTH_SHORT).show()
                 }
             }
         }

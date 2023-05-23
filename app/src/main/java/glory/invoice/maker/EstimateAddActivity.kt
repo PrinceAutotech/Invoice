@@ -15,7 +15,6 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -23,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.io.source.ByteArrayOutputStream
 import com.itextpdf.kernel.colors.ColorConstants
@@ -132,10 +130,16 @@ class EstimateAddActivity : AppCompatActivity() {
         invoiceNo = invoiceInfo.getString("invoiceNo", "")!!
         date = invoiceInfo.getString("date", "")!!
         accountNo = invoiceInfo.getString("accountNo", "")!!
-        binding.invoiceNo.text = invoiceNo
-        binding.dueDate.text = accountNo
-        binding.createdDate.text = date
-        Log.d("TAG", "onCreate:$invoiceNo , $date , $accountNo ")
+
+        if (invoiceNo.isNotEmpty() && invoiceNo.isNotBlank()) {
+            binding.invoiceNo.text = invoiceNo
+            binding.dueDate.text = accountNo
+            binding.createdDate.text = date
+        }else{
+//            invoiceNo = binding.invoiceNo.text.toString()
+//            date = binding.createdDate.text.toString()
+//            accountNo = binding.dueDate.text.toString()
+        }
         taxString = user.getString("term", "")!!
         userViewModel.getUserLive(1)?.observe(this@EstimateAddActivity) { user ->
             if (user != null) {
@@ -277,25 +281,28 @@ class EstimateAddActivity : AppCompatActivity() {
         }
 
         binding.signature.setOnClickListener {
-            //startActivity(Intent(this@EstimateAddActivity, AddSignatureActivity::class.java))
             chooseImageGallery()
         }
 
         binding.save.setOnClickListener {
-
+            val builder = AlertDialog.Builder(this)
+            val customLayout: View = layoutInflater.inflate(R.layout.londing, null)
+            builder.setView(customLayout)
+            val dialog = builder.create()
+            dialog.show()
             AppManage.getInstance(this@EstimateAddActivity).showInterstitialAd(
                 this@EstimateAddActivity, {
                     binding.progressCircular.visibility = View.VISIBLE
-
                     if (items.isNullOrEmpty()) {
                         Toast.makeText(this@EstimateAddActivity, " loading", Toast.LENGTH_SHORT)
                             .show()
+                        dialog.dismiss()
                         binding.progressCircular.visibility = View.GONE
                     } else {
                         binding.progressCircular.visibility = View.GONE
                         //val invoiceNo = binding.invoiceNo.text.toString()
-                        val invoiceDate = binding.createdDate.text.toString()
-                        val invoiceAccount = binding.dueDate.text.toString()
+                        val invoiceDate = date
+                        val invoiceAccount = accountNo
                         val receiverName = binding.name.text.toString()
                         val receiverAddress = "qw"
                         val paypal = binding.paymentDetiles.text.toString()
@@ -329,10 +336,10 @@ class EstimateAddActivity : AppCompatActivity() {
                             )
                         )
                     }
-
                     savePdf()
-
+                    dialog.dismiss()
                     onBackPressedDispatcher.onBackPressed()
+
                 }, "", AppManage.app_mainClickCntSwAd
             )
 
@@ -866,25 +873,28 @@ class EstimateAddActivity : AppCompatActivity() {
     private fun chooseImageGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
-        startActivityForResult(intent, 100)
+        startActivityForResult(intent, 101)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-
             invoiceNo = "${data!!.getStringExtra("invoiceNo")}"
             binding.invoiceNo.text = invoiceNo
             accountNo = "${data.getStringExtra("accountNo")}"
             binding.dueDate.text = accountNo
             date = "${data.getStringExtra("date")}"
             binding.createdDate.text = date
-            if (data.data != null) {
-                filePhoto = getPhotoFile("FILE_NAME.png")
-                val takenPhoto = BitmapFactory.decodeFile(filePhoto.absolutePath)
-                //binding.signatureView.setImageBitmap(takenPhoto)
-                binding.signatureView.setImageURI(data.data)
-                imageUri = data.data!!
+        }
+        if (requestCode == 101 && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                if (data.data != null) {
+                    filePhoto = getPhotoFile("FILE_NAME.png")
+                    val takenPhoto = BitmapFactory.decodeFile(filePhoto.absolutePath)
+                    //binding.signatureView.setImageBitmap(takenPhoto)
+                    binding.signatureView.setImageURI(data.data)
+                    imageUri = data.data!!
+                }
             }
         }
     }

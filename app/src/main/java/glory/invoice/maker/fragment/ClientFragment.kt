@@ -43,10 +43,16 @@ class ClientFragment : Fragment() {
 
 
         userViewModel.getUserWithClient().observe(activityContext as FragmentActivity) { client ->
-            for (i in client) {
-                binding.noData.visibility = View.GONE
-                binding.recyclerview.adapter =
-                    ClientAdapter(activityContext, i.client, ::performOptionsMenuClick)
+            if (client.isEmpty()) {
+                binding.noData.visibility = View.VISIBLE
+                binding.recyclerview.visibility = View.GONE
+            } else {
+                for (i in client) {
+                    binding.noData.visibility = View.GONE
+                    binding.recyclerview.visibility = View.VISIBLE
+                    binding.recyclerview.adapter =
+                        ClientAdapter(activityContext, i.client, ::performOptionsMenuClick)
+                }
             }
         }
         return binding.root
